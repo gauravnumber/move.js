@@ -19,6 +19,7 @@ if (totalNumOfArguments === 3) {
 }
 
 // console.log(totalNumOfArguments)
+// console.log(process.argv)
 
 //? Source and destination given
 if (totalNumOfArguments === 4) {
@@ -34,24 +35,19 @@ if (totalNumOfArguments === 4) {
 	}
 
 	if (!isDestinationExist) {
-		console.error("destination not exist")
+		console.error("Destination not exist")
 		fs.renameSync(source, destination)
 		process.exit(1)
 	}
 
-
+	const sourceStat = fs.statSync(source)
 	const destinationStat = fs.statSync(destination)
 
-	// console.log(destinationStat.isFile())
+	// console.log(process.argv)
+	// console.log(sourceStat.isDirectory())
+	// process.exit(1)
 
-	const sourceStat = fs.statSync(source)
-	//? Maybe destination not exist.
-	// const destinationStat = fs.statSync(destination)
-
-	// Source and Destination are files
-	// if (sourceStat.isFile() && sourceStat.isFile()) {
 	if (sourceStat.isFile() && destinationStat.isFile()) {
-		// if (source === destination) {
 		let destinationNewName
 		let index = 1
 		const extname = path.extname(destination)
@@ -59,26 +55,16 @@ if (totalNumOfArguments === 4) {
 
 		let destinationDirectory = path.resolve(__dirname, destination)
 		destinationDirectory = path.dirname(destinationDirectory)
-		// console.log(destinationDirectory)
 
 		const lists = fs.readdirSync(destinationDirectory)
-		// console.log(lists)
 
 		//? Generating new name for destination
 		do {
 			destinationNewName = `${basename}_${index}${extname}`
-			// console.log(lists)
-			// console.log(destinationNewName)
 			index++
 		} while (lists.indexOf(destinationNewName) !== -1)
 
-		// console.log(destinationNewName)
-		// console.log('both are same file')
 		fs.renameSync(source, destinationNewName)
-		// } else {
-		// console.log("both are different")
-		// fs.renameSync(source, destination)
-		// }
 	} else if (sourceStat.isFile() && destinationStat.isDirectory()) {
 		const lists = fs.readdirSync(destination)
 		const isSourceExistInDestination = lists.indexOf(source) !== -1
@@ -99,5 +85,69 @@ if (totalNumOfArguments === 4) {
 		} else {
 			fs.renameSync(source, destination + '/' + source)
 		}
+
+	} else if (sourceStat.isDirectory() && destinationStat.isDirectory()) {
+		//! rename source directory
+		console.log('both are directory')
+		const sourceDirectoryLists = fs.readdirSync(source)
+		const destinationDirectoryLists = fs.readdirSync(destination)
+
+		console.log(sourceDirectoryLists)
+		console.log(destinationDirectoryLists)
+
+		for (let i = 0; i < sourceDirectoryLists.length; i++) {
+			const singleFile = sourceDirectoryLists[i]
+
+			if (destinationDirectoryLists.includes(singleFile)) {
+				console.log('file exists')
+			} else {
+				console.log('file not exists')
+				// fs.renameSync(singleFile, `${destination}/${singleFile}`)
+			}
+		}
+
+		// Intersection in array
+		// console.log(sourceDirectoryLists.includes(destinationDirectoryLists))
+	}
+}
+
+if (totalNumOfArguments > 4) {
+	const destination = process.argv[totalNumOfArguments - 1]
+
+	if (!fs.existsSync(destination)) {
+		console.error('Destination not exists.')
+		process.exit(1)
+	}
+
+	const destinationStat = fs.statSync(destination)
+
+	if (destinationStat.isDirectory()) {
+		const destinationLists = fs.readdirSync(destination)
+		const sources = process.argv.slice(2, totalNumOfArguments - 1)
+
+		for (let i = 0; i < sources.length; i++) {
+			const singleFile = path.basename(sources[i])
+			const directoryPath = path.dirname(sources[i])
+
+			if (destinationLists.includes(singleFile)) {
+				let destinationNewName
+				let index = 1
+				const extname = path.extname(singleFile)
+				let basename = path.basename(singleFile, extname)
+
+				//? Generating new name for destination
+				do {
+					destinationNewName = `${basename}_${index}${extname}`
+					index++
+				} while (destinationLists.indexOf(destinationNewName) !== -1)
+
+				fs.renameSync(`${directoryPath}/${singleFile}`, destination + '/' + destinationNewName)
+			} else {
+				fs.renameSync(`${directoryPath}/${singleFile}`, `${destination}/${singleFile}`)
+			}
+		}
+	} else {
+		console.error(`${destination} should be directory!`)
+		process.exit(1)
 	}
 }
