@@ -1,14 +1,17 @@
 {
   "name": "move.js",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.2.0",
+  "description": "Appending index if file already exist.",
   "bin": {
     "move": "./move"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "move",
+    "mv"
+  ],
+  "author": "Gaurav Singh",
+  "license": "MIT"
 }
