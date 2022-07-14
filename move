@@ -34,24 +34,16 @@ if (totalNumOfArguments === 4) {
 	}
 
 	if (!isDestinationExist) {
-		console.error("destination not exist")
+		console.error("Destination not exist")
 		fs.renameSync(source, destination)
 		process.exit(1)
 	}
 
-
+	const sourceStat = fs.statSync(source)
 	const destinationStat = fs.statSync(destination)
 
-	// console.log(destinationStat.isFile())
-
-	const sourceStat = fs.statSync(source)
-	//? Maybe destination not exist.
-	// const destinationStat = fs.statSync(destination)
-
-	// Source and Destination are files
-	// if (sourceStat.isFile() && sourceStat.isFile()) {
+	//? Source and Destination are files
 	if (sourceStat.isFile() && destinationStat.isFile()) {
-		// if (source === destination) {
 		let destinationNewName
 		let index = 1
 		const extname = path.extname(destination)
@@ -59,26 +51,16 @@ if (totalNumOfArguments === 4) {
 
 		let destinationDirectory = path.resolve(__dirname, destination)
 		destinationDirectory = path.dirname(destinationDirectory)
-		// console.log(destinationDirectory)
 
 		const lists = fs.readdirSync(destinationDirectory)
-		// console.log(lists)
 
 		//? Generating new name for destination
 		do {
 			destinationNewName = `${basename}_${index}${extname}`
-			// console.log(lists)
-			// console.log(destinationNewName)
 			index++
 		} while (lists.indexOf(destinationNewName) !== -1)
 
-		// console.log(destinationNewName)
-		// console.log('both are same file')
 		fs.renameSync(source, destinationNewName)
-		// } else {
-		// console.log("both are different")
-		// fs.renameSync(source, destination)
-		// }
 	} else if (sourceStat.isFile() && destinationStat.isDirectory()) {
 		const lists = fs.readdirSync(destination)
 		const isSourceExistInDestination = lists.indexOf(source) !== -1
