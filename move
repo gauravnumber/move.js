@@ -87,24 +87,72 @@ if (totalNumOfArguments === 4) {
 		}
 
 	} else if (sourceStat.isDirectory() && destinationStat.isDirectory()) {
-		//! rename source directory
-		console.log('both are directory')
-		const sourceDirectoryLists = fs.readdirSync(source)
-		const destinationDirectoryLists = fs.readdirSync(destination)
+		// rename source directory
+		// console.log('both are directory')
+		const sourceDirectoryname = path.dirname(source)
+		const sourceBasename = path.basename(source)
 
-		console.log(sourceDirectoryLists)
-		console.log(destinationDirectoryLists)
+		const destinationDirectoryname = path.dirname(destination)
+		const destinationBasename = path.basename(destination)
 
-		for (let i = 0; i < sourceDirectoryLists.length; i++) {
-			const singleFile = sourceDirectoryLists[i]
+		// console.log(source, sourceBasename, sourceDirectoryname)
+		// console.log(destination, destinationBasename, destinationDirectoryname)
 
-			if (destinationDirectoryLists.includes(singleFile)) {
-				console.log('file exists')
-			} else {
-				console.log('file not exists')
-				// fs.renameSync(singleFile, `${destination}/${singleFile}`)
-			}
+		// const sourceDirectoryLists = fs.readdirSync(source)
+		// const destinationDirectoryLists = fs.readdirSync(destination).filter(f => f.startsWith(sourceBasename))
+		const destinationDirectoryLists = fs.readdirSync(destination).filter(f => f === sourceBasename)
+		// const destinationLists = fs.readdirSync(destination).filter(f => !f.endsWith(".txt"))
+		//? Select directories.
+		const destinationLists = fs.readdirSync(destination).filter(f => !/\.\w+$/.test(f))
+		console.log('destinationDirectoryLists', destinationDirectoryLists)
+		console.log('destinationLists', destinationLists)
+		// process.exit(1)
+
+		if (destinationDirectoryLists.length) {
+			// console.log('source file exists')
+			// for (let i = 0; i < destinationLists.length; i++) {
+			const singleDirectory = destinationDirectoryLists[0]
+			let destinationNewName
+			let index = 1
+			console.log(sourceBasename)
+			// const extname = path.extname(source)
+			// let basename = path.basename(source, extname)
+
+			//? Generating new name for destination
+			do {
+				destinationNewName = `${singleDirectory}_${index}`
+				index++
+			} while (destinationLists.indexOf(destinationNewName) !== -1)
+
+			console.log('singleDirectory', singleDirectory)
+			console.log(`destinationNewName`, destinationNewName)
+			console.log('destination', destination)
+
+			fs.renameSync(source, `${destination}/${destinationNewName}`)
+
+
+			// }
+		} else {
+			console.log('source file not exists')
+			// console.log(`${sourceDirectoryname}/${sourceBasename}`, `${destinationDirectoryname}/${destinationBasename}`)
+			// console.log(source, destination)
+			fs.renameSync(source, `${destination}/${source}`)
+			// fs.renameSync(`${sourceDirectoryname}/${sourceBasename}`, `${destinationDirectoryname}/${destinationBasename}`)
 		}
+
+		// console.log(sourceDirectoryLists)
+		// console.log(destinationDirectoryLists)
+
+		// for (let i = 0; i < sourceDirectoryLists.length; i++) {
+		// 	const singleFile = sourceDirectoryLists[i]
+
+		// 	if (destinationDirectoryLists.includes(singleFile)) {
+		// 		console.log('file exists')
+		// 	} else {
+		// 		console.log('file not exists')
+		// 		// fs.renameSync(singleFile, `${destination}/${singleFile}`)
+		// 	}
+		// }
 
 		// Intersection in array
 		// console.log(sourceDirectoryLists.includes(destinationDirectoryLists))
