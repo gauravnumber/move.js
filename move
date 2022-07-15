@@ -16,8 +16,8 @@ if (totalNumOfArguments === 3) {
 
 //? Source and destination given
 if (totalNumOfArguments === 4) {
-	const source = process.argv[2]
-	const destination = process.argv[3]
+	const source = path.resolve(process.argv[2])
+	const destination = path.resolve(process.argv[3])
 
 	const isSourceExist = fs.existsSync(source)
 	const isDestinationExist = fs.existsSync(destination)
@@ -39,14 +39,11 @@ if (totalNumOfArguments === 4) {
 	if (sourceStat.isFile() && destinationStat.isFile()) {
 		let destinationNewName
 		let index = 1
+
 		const extname = path.extname(destination)
 		let basename = path.basename(destination, extname)
-		const dirname = path.dirname(destination)
-
-		let destinationDirectory = path.resolve(__dirname, destination)
-		destinationDirectory = path.dirname(destinationDirectory)
-
-		const lists = fs.readdirSync(destinationDirectory)
+		const destinationDirname = path.dirname(destination)
+		const lists = fs.readdirSync(destinationDirname)
 
 		//? Generating new name for destination
 		do {
@@ -54,7 +51,7 @@ if (totalNumOfArguments === 4) {
 			index++
 		} while (lists.indexOf(destinationNewName) !== -1)
 
-		const destinationPath = path.join(dirname, destinationNewName)
+		const destinationPath = path.join(destinationDirname, destinationNewName)
 
 		fs.renameSync(source, destinationPath)
 	} else if (sourceStat.isFile() && destinationStat.isDirectory()) {
