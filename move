@@ -28,9 +28,9 @@ if (totalNumOfArguments === 4) {
 	}
 
 	if (!isDestinationExist) {
-		console.error("Destination not exist")
+		// console.error("Destination not exist")
 		fs.renameSync(source, destination)
-		process.exit(1)
+		process.exit(0)
 	}
 
 	const sourceStat = fs.statSync(source)
