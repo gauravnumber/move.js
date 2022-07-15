@@ -41,6 +41,7 @@ if (totalNumOfArguments === 4) {
 		let index = 1
 		const extname = path.extname(destination)
 		let basename = path.basename(destination, extname)
+		const dirname = path.dirname(destination)
 
 		let destinationDirectory = path.resolve(__dirname, destination)
 		destinationDirectory = path.dirname(destinationDirectory)
@@ -53,7 +54,9 @@ if (totalNumOfArguments === 4) {
 			index++
 		} while (lists.indexOf(destinationNewName) !== -1)
 
-		fs.renameSync(source, destinationNewName)
+		const destinationPath = path.join(dirname, destinationNewName)
+
+		fs.renameSync(source, destinationPath)
 	} else if (sourceStat.isFile() && destinationStat.isDirectory()) {
 		const lists = fs.readdirSync(destination)
 		const isSourceExistInDestination = lists.indexOf(source) !== -1
@@ -70,8 +73,10 @@ if (totalNumOfArguments === 4) {
 				index++
 			} while (lists.indexOf(destinationNewName) !== -1)
 
+			console.log('file here')
 			fs.renameSync(source, destination + '/' + destinationNewName)
 		} else {
+			console.log('file rename ')
 			fs.renameSync(source, destination + '/' + source)
 		}
 
