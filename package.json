@@ -1,5 +1,5 @@
 {
-  "name": "move.js",
+  "name": "@gauravnumber/move",
   "version": "0.2.0",
   "description": "Appending index if file already exist.",
   "bin": {
