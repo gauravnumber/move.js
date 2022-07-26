@@ -5,6 +5,9 @@
   "bin": {
     "move": "./move"
   },
+  "scripts": {
+    "test": "echo \"Error: no test specified\""
+  },
   "keywords": [
     "move",
     "mv"
