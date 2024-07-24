@@ -1,7 +1,6 @@
 # move
 
-![GitHub file size in bytes](https://img.shields.io/github/size/gauravnumber/move.js/move)
-![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/gauravnumber/move.js)
+![GitHub tag (latest SemVer)](https://img.shields.io/npm/v/%40gauravnumber%2Fmove)
 ![Twitter Follow](https://img.shields.io/twitter/follow/gauravnumber)
 
 `mv` command doesn't support renaming file (adding an index/number) when file already exists, so I created `move`.
