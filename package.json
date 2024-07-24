@@ -1,7 +1,7 @@
 {
   "name": "@gauravnumber/move",
   "version": "0.2.2",
-  "description": "Mv replacement that renames the file if it already exists.",
+  "description": "mv replacement that renames the file if it already exists.",
   "bin": {
     "move": "./move"
   },
