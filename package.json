@@ -1,5 +1,5 @@
 {
-  "name": "@gauravnumber/move",
+  "name": "@anonymousaga/move",
   "version": "0.2.2",
   "description": "Appending index if file already exist.",
   "bin": {
@@ -12,6 +12,6 @@
     "move",
     "mv"
   ],
-  "author": "Gaurav Singh",
+  "author": "Gaurav Singh + Abhijeet Ghosh",
   "license": "MIT"
 }
