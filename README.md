@@ -4,9 +4,9 @@
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/gauravnumber/move.js)
 ![Twitter Follow](https://img.shields.io/twitter/follow/gauravnumber?style=social)
 
-`mv` command does not support adding index when file exists so I create `move`.
+`mv` command doesn't support renaming file (adding an index/number) when file already exists, so I created `move`.
 
-`move` didn't have any dependencies.
+`move` doesn't have any dependencies.
 
 ## Install
 
@@ -14,9 +14,13 @@
 node install -g @gauravnumber/move
 ```
 
+## Usage
+
+move <source_path> <destination_path>
+
 ## Example
 
-Folder Structure
+Initial Folder Structure
 
 ```
 .
@@ -28,13 +32,13 @@ Folder Structure
 └── 6.txt
 ```
 
-Type below command.
+Execute the command below
 
 ```
 move 1.txt 2.txt
 ```
 
-`2.txt` file already exists. `move` command append index on the file. After running above command. Folder structure looks like this.
+`2.txt` file already exists, so `move` appends an index to the filename. After running above command, the folder structure looks like this.
 
 ```
 .
