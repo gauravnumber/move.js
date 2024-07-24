@@ -1,5 +1,5 @@
 {
-  "name": "@anonymousaga/move",
+  "name": "@gauravnumber/move",
   "version": "0.2.2",
   "description": "Appending index if file already exist.",
   "bin": {
