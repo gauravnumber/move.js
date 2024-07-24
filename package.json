@@ -1,7 +1,7 @@
 {
   "name": "@anonymousaga/move",
   "version": "0.2.2",
-  "description": "Appending index if file already exist.",
+  "description": "Mv replacement that renames the file if it already exists.",
   "bin": {
     "move": "./move"
   },
@@ -12,6 +12,9 @@
     "move",
     "mv"
   ],
-  "author": "Gaurav Singh + Abhijeet Ghosh",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Gaurav Singh",
   "license": "MIT"
 }
