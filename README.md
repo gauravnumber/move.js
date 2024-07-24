@@ -16,7 +16,9 @@ node install -g @gauravnumber/move
 
 ## Usage
 
+```
 move <source_path> <destination_path>
+```
 
 ## Example
 
