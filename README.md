@@ -10,7 +10,7 @@
 ## Install
 
 ```
-node install -g @gauravnumber/move
+npm i -g @gauravnumber/move
 ```
 
 ## Usage
