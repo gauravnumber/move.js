@@ -1,155 +1,91 @@
 #!/usr/bin/env node
 
-const fs = require('fs')
-const path = require('path')
+const fs = require("fs");
+const path = require("path");
 
-const totalNumOfArguments = process.argv.length
+const args = process.argv.slice(2);
 
-if (totalNumOfArguments === 2) {
-	console.error("Source and Destination needed.")
-	process.exit(1)
+if (args.length < 2) {
+  console.error(
+    args.length === 0 ? "Source and Destination needed." : "Destination needed."
+  );
+  process.exit(1);
 }
 
-if (totalNumOfArguments === 3) {
-	console.error("Destination needed.")
-	process.exit(1)
+// Helper to generate a non-conflicting file/directory name
+function getUniqueName(baseDir, originalName) {
+  const ext = path.extname(originalName);
+  const name = path.basename(originalName, ext);
+  let index = 1;
+  let newName = originalName;
+
+  const existing = new Set(fs.readdirSync(baseDir));
+  while (existing.has(newName)) {
+    newName = `${name}_${index}${ext}`;
+    index++;
+  }
+
+  return path.join(baseDir, newName);
 }
 
-//? Source and destination given
-if (totalNumOfArguments === 4) {
-	//? Absolute path of source and destination
-	const source = path.resolve(process.argv[2])
-	const destination = path.resolve(process.argv[3])
+// Rename or move a single file/directory
+function moveItem(source, destination) {
+  if (!fs.existsSync(source)) {
+    console.error(`Source not found: ${source}`);
+    process.exit(1);
+  }
 
-	const isSourceExist = fs.existsSync(source)
-	const isDestinationExist = fs.existsSync(destination)
+  const sourceStat = fs.statSync(source);
+  const sourceName = path.basename(source);
 
-	if (!isSourceExist) {
-		console.error("Source not exist.")
-		process.exit(1)
-	}
+  if (!fs.existsSync(destination)) {
+    // Destination does not exist → simple rename
+    fs.renameSync(source, destination);
+    return;
+  }
 
-	if (!isDestinationExist) {
-		fs.renameSync(source, destination)
-		process.exit(0)
-	}
+  const destStat = fs.statSync(destination);
 
-	const sourceStat = fs.statSync(source)
-	const destinationStat = fs.statSync(destination)
-
-	if (sourceStat.isFile() && destinationStat.isFile()) {
-		let destinationNewName
-		let index = 1
-
-		const extname = path.extname(destination)
-		let basename = path.basename(destination, extname)
-		const destinationDirname = path.dirname(destination)
-		const lists = fs.readdirSync(destinationDirname)
-
-		//? Generating new name for destination
-		do {
-			destinationNewName = `${basename}_${index}${extname}`
-			index++
-		} while (lists.indexOf(destinationNewName) !== -1)
-
-		const destinationPath = path.join(destinationDirname, destinationNewName)
-
-		fs.renameSync(source, destinationPath)
-	} else if (sourceStat.isFile() && destinationStat.isDirectory()) {
-		const basename = path.basename(source)
-		const lists = fs.readdirSync(destination)
-
-		const isSourceExistInDestination = lists.indexOf(basename) !== -1
-
-		if (isSourceExistInDestination) {
-			let destinationNewName
-			let index = 1
-			const extname = path.extname(basename)
-			let fileNameWithoutExtension = path.basename(basename, extname)
-
-			//? Generating new name for destination
-			do {
-				destinationNewName = `${fileNameWithoutExtension}_${index}${extname}`
-				index++
-			} while (lists.indexOf(destinationNewName) !== -1)
-
-			const destinationPath = path.join(destination, destinationNewName)
-
-			fs.renameSync(source, destinationPath)
-		} else {
-			const basename = path.basename(source)
-			const destinationPath = path.join(destination, basename)
-
-			fs.renameSync(source, destinationPath)
-		}
-
-	} else if (sourceStat.isDirectory() && destinationStat.isDirectory()) {
-		const sourceBasename = path.basename(source)
-		const destinationDirectoryLists = fs.readdirSync(destination).filter(f => f === sourceBasename)
-
-		//? Select directories.
-		const destinationLists = fs.readdirSync(destination).filter(f => !/\.\w+$/.test(f))
-
-		if (destinationDirectoryLists.length) {
-			const singleDirectory = destinationDirectoryLists[0]
-			let destinationNewName
-			let index = 1
-
-			//? Generating new name for destination
-			do {
-				destinationNewName = `${singleDirectory}_${index}`
-				index++
-			} while (destinationLists.indexOf(destinationNewName) !== -1)
-
-			const destinationPath = path.join(destination, destinationNewName)
-			fs.renameSync(source, destinationPath)
-		} else {
-			const basename = path.basename(source)
-			const destinationPath = path.join(destination, basename)
-
-			fs.renameSync(source, destinationPath)
-		}
-	}
+  if (sourceStat.isFile()) {
+    if (destStat.isFile()) {
+      const newDest = getUniqueName(
+        path.dirname(destination),
+        path.basename(destination)
+      );
+      fs.renameSync(source, newDest);
+    } else if (destStat.isDirectory()) {
+      const newName = fs.existsSync(path.join(destination, sourceName))
+        ? getUniqueName(destination, sourceName)
+        : path.join(destination, sourceName);
+      fs.renameSync(source, newName);
+    }
+  } else if (sourceStat.isDirectory()) {
+    if (!destStat.isDirectory()) {
+      console.error("Cannot move a directory into a file.");
+      process.exit(1);
+    }
+    const newName = fs.existsSync(path.join(destination, sourceName))
+      ? getUniqueName(destination, sourceName)
+      : path.join(destination, sourceName);
+    fs.renameSync(source, newName);
+  }
 }
 
-if (totalNumOfArguments > 4) {
-	let destination = process.argv[totalNumOfArguments - 1]
-	destination = path.resolve(destination)
+// Handle single source
+if (args.length === 2) {
+  const [src, dest] = args.map((arg) => path.resolve(arg));
+  moveItem(src, dest);
+}
 
-	if (!fs.existsSync(destination)) {
-		console.error('Destination not exists.')
-		process.exit(1)
-	}
+// Handle multiple sources (last arg is destination directory)
+if (args.length > 2) {
+  const dest = path.resolve(args[args.length - 1]);
+  const sources = args.slice(0, -1).map((arg) => path.resolve(arg));
 
-	const destinationStat = fs.statSync(destination)
+  if (!fs.existsSync(dest) || !fs.statSync(dest).isDirectory()) {
+    console.error(`Destination must be an existing directory: ${dest}`);
+    process.exit(1);
+  }
 
-	if (destinationStat.isDirectory()) {
-		const destinationLists = fs.readdirSync(destination)
-		const sources = process.argv.slice(2, totalNumOfArguments - 1)
-
-		for (let i = 0; i < sources.length; i++) {
-			const singleFile = path.basename(sources[i])
-			const directoryPath = path.dirname(sources[i])
-
-			if (destinationLists.includes(singleFile)) {
-				let destinationNewName
-				let index = 1
-				const extname = path.extname(singleFile)
-				let basename = path.basename(singleFile, extname)
-
-				//? Generating new name for destination
-				do {
-					destinationNewName = `${basename}_${index}${extname}`
-					index++
-				} while (destinationLists.indexOf(destinationNewName) !== -1)
-
-				fs.renameSync(`${directoryPath}/${singleFile}`, destination + '/' + destinationNewName)
-			} else {
-				fs.renameSync(`${directoryPath}/${singleFile}`, `${destination}/${singleFile}`)
-			}
-		}
-	} else {
-		console.error(`${destination} should be directory!`)
-		process.exit(1)
-	}
+  sources.forEach((src) => moveItem(src, dest));
 }
